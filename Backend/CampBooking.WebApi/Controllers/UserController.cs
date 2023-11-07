@@ -1,50 +1,74 @@
 ﻿using CampBooking.Domain.DTOs;
 using CampBooking.Service.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CampBooking.WebApi.Controllers
+namespace CampBooking.WebApi.Controllers;
+
+/// <summary>
+/// Represents user controller for managing user details.
+/// </summary>
+[ApiController]
+[Route("api/User")]
+[Produces("application/json")]
+public class UserController : Controller
 {
-    [ApiController]
-    [Route("api/User")]
-    public class UserController : Controller
+    /// <summary>
+    /// Represents user service interface.
+    /// </summary>
+    private readonly IUserService _service;
+
+    /// <summary>
+    /// Create an instance of UserController class.
+    /// </summary>
+    /// <param name="service">The user service interface.</param>
+    public UserController(IUserService service)
     {
-        private readonly IUserService _service;
+        _service = service;
+    }
 
-        public UserController(IUserService service)
+    /// <summary>
+    /// Login to camp booking.
+    /// </summary>
+    /// <param name="user">The request user details.</param>
+    /// <returns>Returns a response indicating the login operation result.</returns>
+    /// <response code="200">Returns "Success".</response>
+    /// <response code="400">Bad request if invalid user details.</response>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequest))]
+    public IActionResult Login(LoginUser user)
+    {
+        var result = _service.LoginUsingEmailAndPassword(user);
+
+        if (result == false)
         {
-            _service = service;
+            return BadRequest();
         }
 
-        /// <summary>
-        /// Login to camp booking
-        /// </summary>
-        /// <param name="user">The request user details.</param>
-        /// <returns>Returns a response that indicate the login operation.</returns>
-        /// <response code="200">Returns "Success".</response>
-        /// <response code="400">Bad request if invalid user details.</response>
-        [HttpPost]
-        public IActionResult Login(LoginUser user)
+        return Ok("Success");
+    }
+
+    /// <summary>
+    /// Check request user is present or not.
+    /// </summary>
+    /// <param name="email">The request user unique identifier email id.</param>
+    /// <returns>Returns a response indicating the user details is found or not.</returns>
+    /// <response code="200">Returns user details.</response>
+    /// <response code="404">Not Found if user not present.</response>
+    [HttpPost]
+    [Route("find-user/{email}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginUserDetails))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFound))]
+    public IActionResult UserDetailsByEmail([FromRoute] string email)
+    {
+        var result = _service.GetUserDetails(email);
+
+        if (result == null)
         {
-            var result = _service.LoginUsingEmailAndPassword(user);
-
-            if (result == false)
-            {
-                return BadRequest();
-            }
-
-            return Ok("Success");
+            return NotFound();
         }
 
-        [HttpPost]
-        [Route("find-user/{email}")]
-        public IActionResult UserDetailsByEmail([FromRoute] string email)
-        {
-            var result = _service.GetUserDetails(email);
-            if(result == null)
-            {
-                return Json("User Not Found");
-            }
-            return Json(result);
-        }
+        return Ok(result);
     }
 }
