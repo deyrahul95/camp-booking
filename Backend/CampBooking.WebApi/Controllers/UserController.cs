@@ -15,14 +15,23 @@ namespace CampBooking.WebApi.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Login to camp booking
+        /// </summary>
+        /// <param name="user">The request user details.</param>
+        /// <returns>Returns a response that indicate the login operation.</returns>
+        /// <response code="200">Returns "Success".</response>
+        /// <response code="400">Bad request if invalid user details.</response>
         [HttpPost]
-        public IActionResult Login(LoginUser _user)
+        public IActionResult Login(LoginUser user)
         {
-            var result = _service.LoginUsingEmailAndPassword(_user);
+            var result = _service.LoginUsingEmailAndPassword(user);
+
             if (result == false)
             {
-                return Ok("Failure");
+                return BadRequest();
             }
+
             return Ok("Success");
         }
 
