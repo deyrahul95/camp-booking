@@ -1,0 +1,434 @@
+<app-header [pageTitle]="pageTitle"></app-header>
+
+<div class="mt-5 px-28">
+  <div class="container mx-auto flex border-2 border-cyan-800 px-2 rounded-lg">
+    <div class="w-2/5">
+      <!-- image -->
+      <img
+        src="{{ camp.imageUrl }}"
+        alt="camp image"
+        class="mt-5 mb-10 w-3/4 max-h-96 mx-auto object-fill"
+      />
+      <!-- camp name -->
+      <div class="px-10">
+        <h1 class="text-lg font-semibold">
+          {{ camp.name }}
+          <span class="text-right ml-10" *ngIf="camp.rating > 0"
+            >⭐{{ camp.rating }}/5.0</span
+          >
+        </h1>
+      </div>
+      <!-- max person and price -->
+      <div class="px-10 py-2 w-full flex justify-between">
+        <span class="font-medium w-1/5">Max: {{ camp.capacity }} person</span>
+        <span class="font-medium w-1/5"
+          >{{ camp.price | currency : "INR" }} per night (for 1 person)*</span
+        >
+        <span class="font-medium w-1/5"
+          >{{ camp.price + 500 | currency : "INR" }} per night (for
+          Fri,Sat,Sun)</span
+        >
+      </div>
+      <!-- description -->
+      <div class="px-10">
+        <p>{{ camp.description }}</p>
+      </div>
+    </div>
+    <!-- form for booking -->
+    <div class="w-3/5 m-5 p-2 bg-sky-100 rounded-xl px-5">
+      <div class="text-sky-700 p-2 px-8">
+        <div>
+          <span class="text-xl">Total stay: &nbsp; {{ value }} nights</span>
+        </div>
+        <div>
+          <span class="text-xl"
+            >Total amount: &nbsp;
+            {{
+              value * camp.price * Person.value + weekday * 500 * Person.value
+                | currency : "INR"
+            }}</span
+          >
+          <span class="text-sm text-slate-600 px-5"
+            >*(Amount may very in weekdays, )</span
+          >
+        </div>
+        <hr class="border-y-2 border-gray-400 mt-3" />
+        <div class="mt-5">
+          <p class="text-black">
+            Please fill details below to complete booking
+          </p>
+        </div>
+        <form method="post" [formGroup]="bookingForm">
+          <div>
+            <span class="text-xl inline-block w-1/3">Check In</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="date"
+              [min]="today"
+              formControlName="checkIn"
+            />
+            <span
+              ><i
+                class="mx-5 fas fa-spinner fa-lg cursor-pointer"
+                title="Check for avalibility of booking"
+                (click)="changeValue()"
+              ></i
+            ></span>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CheckIn.errors?.['required'] && (CheckIn.dirty || CheckIn.touched)"
+            >
+              ChekIn Date is Required.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="!isFreeForBook && (CheckIn.dirty || CheckIn.touched)"
+            >
+              Selected Date is Already Booked!
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">Check Out</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="date"
+              [min]="CheckIn.value"
+              formControlName="checkOut"
+            />
+            <span
+              ><i
+                class="mx-5 fas fa-spinner fa-lg cursor-pointer"
+                title="Check for avalibility of booking"
+                (click)="changeValue()"
+              ></i
+              ><span class="text-xs text-gray-500"
+                >[Check for avalibility]</span
+              ></span
+            >
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CheckOut.errors?.['required'] && (CheckOut.dirty || CheckOut.touched)"
+            >
+              ChekOut Date is Required.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="!isFreeForBook && (CheckOut.dirty || CheckOut.touched)"
+            >
+              Selected Date is Already Booked!
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">Total Person Stayed</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="number"
+              [max]="camp.capacity"
+              formControlName="person"
+              (click)="changeValue()"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Person.errors?.['required'] && (Person.dirty || Person.touched)"
+            >
+              Total Person is Required.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="
+                Person.value > camp.capacity && (Person.dirty || Person.touched)
+              "
+            >
+              Total Person exceds limit.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Person.errors?.['pattern'] && (Person.dirty || Person.touched)"
+            >
+              Total Person must be only number.
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">Billing Address</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="text"
+              formControlName="address"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Address.errors?.['required'] && (Address.dirty || Address.touched)"
+            >
+              Billing Address is Required. Please enter your Billing Address.
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">State</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="text"
+              formControlName="state"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="State.errors?.['required'] && (State.dirty || State.touched)"
+            >
+              State is Required. Please enter your State.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="State.errors?.['pattern'] && (State.dirty || State.touched)"
+            >
+              State must be only text. Please enter correct State.
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">Country</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="text"
+              formControlName="country"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Country.errors?.['required'] && (Country.dirty || Country.touched)"
+            >
+              Country is Required. Please enter your Country.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Country.errors?.['pattern'] && (Country.dirty || Country.touched)"
+            >
+              Country must be only text. Please enter correct Country.
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">ZipCode</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="text"
+              formControlName="zipcode"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Zipcode.errors?.['required'] && (Zipcode.dirty || Zipcode.touched)"
+            >
+              Zipcode is Required. Please enter your Zipcode.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Zipcode.errors?.['pattern'] && (Zipcode.dirty || Zipcode.touched)"
+            >
+              Zipcode must be only number. Please enter correct Zipcode.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Zipcode.errors?.['minlength'] && (Zipcode.dirty || Zipcode.touched)"
+            >
+              Zipcode must be 6 length.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="Zipcode.errors?.['maxlength'] && (Zipcode.dirty || Zipcode.touched)"
+            >
+              Zipcode not greater than 6 length.
+            </div>
+          </div>
+          <div class="my-2">
+            <span class="text-xl inline-block w-1/3">Cell Phone</span>
+            <input
+              class="w-1/3 bg-transparent border-2 border-sky-700 p-1 outline-none"
+              type="text"
+              formControlName="cellphone"
+            />
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CellPhone.errors?.['required'] && (CellPhone.dirty || CellPhone.touched)"
+            >
+              CellPhone is Required. Please enter your CellPhone.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CellPhone.errors?.['pattern'] && (CellPhone.dirty || CellPhone.touched)"
+            >
+              CellPhone must be only number. Please enter correct CellPhone.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CellPhone.errors?.['minlength'] && (CellPhone.dirty || CellPhone.touched)"
+            >
+              CellPhone must be 10 length.
+            </div>
+            <div
+              class="text-red-500 mx-48"
+              *ngIf="CellPhone.errors?.['maxlength'] && (CellPhone.dirty || CellPhone.touched)"
+            >
+              CellPhone not greater than 10 length.
+            </div>
+          </div>
+          <div class="text-center mt-3 mb-3">
+            <button
+              mat-raised-button
+              [disabled]="bookingForm.invalid"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop"
+              (click)="confirmBooking()"
+            >
+              <span class="text-cyan-700 text-lg font-semibold"
+                >Confirm Booking</span
+              >
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container px-28 my-5" *ngIf="comments.length > 0">
+  <h1>Reviews</h1>
+  <p *ngFor="let item of comments">
+    {{ item }}
+  </p>
+</div>
+
+<!-- footer -->
+<footer
+  class="mat-footer-cell container w-full text-center bg-gray-500 text-white mt-5"
+>
+  <p class="mx-auto py-3">Valley Forge Camp Booking | Thank You. Visit Again</p>
+</footer>
+
+<!-- Modal -->
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+  *ngIf="!referenceNumber"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md"
+      >
+        <h2
+          class="text-xl font-medium leading-normal text-gray-800"
+          id="exampleModalLabel"
+        >
+          Please check once again before confirm your booking
+        </h2>
+      </div>
+      <div class="modal-body relative p-4">
+        <h3>CheckIn Date : {{ CheckIn.value }}</h3>
+        <h3>CheckOut Date : {{ CheckOut.value }}</h3>
+        <h3>Total Night Stayed : {{ value }}</h3>
+        <h3>Total Person Stayed : {{ Person.value }}</h3>
+        <p>Billing Address : {{ Address.value }}</p>
+        <p>State : {{ State.value }}</p>
+        <p>Country : {{ Country.value }}</p>
+        <p>ZipCode : {{ Zipcode.value }}</p>
+        <p>Cell Phone : {{ CellPhone.value }}</p>
+        <h2>
+          Total Price : INR
+          {{
+            value * camp.price * Person.value -
+              discountPrice +
+              weekday * 500 * Person.value
+          }}
+        </h2>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md"
+      >
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+        >
+          Cancle
+        </button>
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          (click)="submitBookingForm()"
+          data-bs-toggle="modal"
+          data-bs-target="#bookingSuccessfull"
+        >
+          Book Camp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="bookingSuccessfull"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-green-300 bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-center p-4 border-b border-gray-200 rounded-t-md"
+      >
+        <h2
+          class="text-xl font-medium leading-normal text-center text-gray-800"
+          id="exampleModalLabel"
+          *ngIf="referenceNumber"
+        >
+          Booking Successfull ✅
+        </h2>
+        <h2
+          class="text-xl font-medium leading-normal text-center text-gray-800"
+          id="exampleModalLabel"
+          *ngIf="!referenceNumber"
+        >
+          Waiting for the confirmation......
+        </h2>
+        <div class="flex justify-center items-center" *ngIf="!referenceNumber">
+          <div
+            class="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body relative p-4">
+        <h3 *ngIf="referenceNumber">
+          Booking Reference Number {{ referenceNumber }}
+        </h3>
+        <p *ngIf="referenceNumber">
+          Please save your booking reference number for future used.
+        </p>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center p-4 border-t border-gray-200 rounded-b-md"
+      >
+        <button
+          type="button"
+          data-bs-dismiss="modal"
+          class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          routerLink="/dashboard"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

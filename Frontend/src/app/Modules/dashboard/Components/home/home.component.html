@@ -1,0 +1,169 @@
+<app-header></app-header>
+
+<div class="container w-full flex mx-auto px-28">
+  <div
+    class="w-1/5 p-2 mr-4 border-2 border-gray-400 bg-sky-200 rounded flex-none"
+    style="height: max-content"
+  >
+    <app-search (searchCamps)="onClickSearch($event)"></app-search>
+  </div>
+  <div class="w-4/5 ml-2">
+    <div class="flex justify-between mb-3">
+      <!-- search by name -->
+      <input
+        type="text"
+        class="form-control outline-none border-2 border-cyan-600 text-blue-700 font-medium rounded-full px-3 text-md p-1 w-1/3"
+        name="name"
+        id="name"
+        [(ngModel)]="name"
+        (ngModelChange)="Search()"
+        placeholder="Enter Name to Search"
+      />
+      <div class="flex w-1/3 justify-between">
+        <!-- sort by price -->
+        <button
+          class="border-2 border-cyan-600 font-medium text-blue-700 rounded-full hover:bg-sky-700 hover:text-white"
+          (click)="sort('price')"
+        >
+          <span class="px-5"
+            >Sort By Price
+            <span
+              ><i
+                class="fas fa-sort-amount-down px-1"
+                *ngIf="key == 'price' && reverse"
+              ></i
+            ></span>
+            <span
+              ><i
+                class="fas fa-sort-amount-up-alt px-1"
+                *ngIf="key == 'price' && !reverse"
+              ></i
+            ></span>
+          </span>
+        </button>
+        <!-- sort by rating -->
+        <button
+          class="border-2 border-cyan-600 font-medium text-blue-700 rounded-full hover:bg-sky-700 hover:text-white"
+          (click)="sort('rating')"
+        >
+          <span class="px-5"
+            >Sort By Rating
+            <span
+              ><i
+                class="fas fa-sort-amount-down px-1"
+                *ngIf="key == 'rating' && reverse"
+              ></i
+            ></span>
+            <span
+              ><i
+                class="fas fa-sort-amount-up-alt px-1"
+                *ngIf="key == 'rating' && !reverse"
+              ></i
+            ></span>
+          </span>
+        </button>
+      </div>
+    </div>
+    <!-- name: {{number}} matches found -->
+    <h1 *ngIf="name">
+      <span class="font-medium underline decoration-3 decoration-slate-400"
+        >{{ name }} : {{ matches }} matches found</span
+      >
+    </h1>
+    <!-- ng for camp list -->
+    <div
+      class="w-full mb-5 p-2 border-2 border-cyan-700 flex flex-row"
+      *ngFor="
+        let camp of campList
+          | orderBy : key : reverse
+          | paginate : { itemsPerPage: itemsPerPage, currentPage: page }
+      "
+    >
+      <!-- image -->
+      <div class="flex-none">
+        <img
+          src="{{ camp.imageUrl }}"
+          class="w-56 h-36 object-fill hover:scale-110 transition duration-300 ease-in-out"
+          alt="camp image"
+        />
+      </div>
+
+      <div class="m-2 flex justify-between w-full">
+        <!-- description and title -->
+
+        <div class="w-2/3 px-7 my-1 text-left">
+          <span
+            routerLink="booking-screen/{{ camp.id }}"
+            class="text-xl font-medium text-blue-600 hover:text-sky-700 cursor-pointer py-1"
+            >{{ camp.name | slice : 0 : 40 }}</span
+          >
+          <span *ngIf="camp.name.length > 40">...</span>
+          <br />
+          <span class="text-left">
+            {{ camp.description | slice : 0 : 120 }}
+            <span *ngIf="camp.description.length > 120">...</span></span
+          ><br />
+          <div class="px-2 my-2 border-l-2 border-gray-400">
+            <span class="text-left font-medium"
+              >Max {{ camp.capacity }} Person</span
+            >
+            <br />
+            <span class="text-green-600 font-medium">
+              Free cancellation . No prepayment needed
+            </span>
+            <br />
+          </div>
+        </div>
+
+        <!-- price, max person, check availability  -->
+        <div class="w-1/3 px-7 text-right">
+          <p class="text-right" *ngIf="camp.rating > 0">
+            ⭐{{ camp.rating }}&nbsp;/5.0
+          </p>
+          <p class="text-right" *ngIf="camp.rating == 0">⭐No Rating</p>
+          <p class="text-right pt-5">
+            <span class="font-semibold text-cyan-800">
+              {{ camp.price | currency : "INR" }}</span
+            >
+            <span> per night </span>
+          </p>
+
+          <button
+            class="text-right border-2 border-blue-400 text-white bg-sky-600 hover:bg-cyan-800 p-2 px-4 font-medium rounded-lg"
+            routerLink="booking-screen/{{ camp.id }}"
+          >
+            See availability
+            <span><i class="fas fa-arrow-circle-right fa-lg px-1"></i></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- pagination -->
+    <div class="px-10 pt-2 flex justify-between">
+      <div>
+        Items per page :
+        <select
+          name="itemsPerPage"
+          id="itemsPerPage"
+          [(ngModel)]="itemsPerPage"
+          (ngModelChange)="onPageChange($event)"
+          class="px-5 p-2 outline-none border-2 border-gray-300 rounded-lg"
+        >
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+      <pagination-controls (pageChange)="page = $event"></pagination-controls>
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<footer
+  class="mat-footer-cell container w-full text-center bg-gray-500 text-white mt-5"
+>
+  <p class="mx-auto py-3">Valley Forge Camp Booking | Thank You. Visit Again</p>
+</footer>

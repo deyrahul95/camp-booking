@@ -1,0 +1,96 @@
+<div class="container">
+  <div
+    class="w-1/2 mx-auto my-20 p-10 bg-cyan-100 rounded-xl shadow-xl shadow-gray-400"
+  >
+    <div class="flex justify-center">
+      <img
+        src="../../../../../assets/campLogo.png"
+        alt="logo"
+        width="100px"
+        height="100px"
+        class="object-fit rounded-full mx-auto"
+      />
+    </div>
+    <div class="flex-none text-center">
+      <p class="text-3xl font-semibold text-gray-600 my-5">Camp Booking</p>
+      <form method="post" [formGroup]="loginForm" (ngSubmit)="loginSubmited()">
+        <div class="my-10">
+          <h2 class="text-gray-500">Sign In</h2>
+          <div>
+            <input
+              type="email"
+              name="emial"
+              id="email"
+              placeholder="Email"
+              required
+              formControlName="email"
+              class="my-2 p-2 outline-none border-2 border-gray-400 w-1/2"
+            />
+            <div
+              class="text-red-500"
+              *ngIf="Email.errors?.['required'] && (Email.dirty || Email.touched)"
+            >
+              Email is Required. Please Enter your Email.
+            </div>
+            <div
+              class="text-red-500"
+              *ngIf="Email.errors?.['email'] && (Email.dirty || Email.touched)"
+            >
+              Email is Not Valid. Please Enter valid Email.
+            </div>
+          </div>
+          <div>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Password"
+              required
+              formControlName="password"
+              class="p-2 outline-none border-2 border-gray-400 w-1/2"
+            />
+            <div
+              class="text-red-500"
+              *ngIf="Password.errors?.['required'] && (Password.dirty || Password.touched)"
+            >
+              Password is Required. Please Enter your Password.
+            </div>
+            <div
+              class="text-red-500"
+              *ngIf="Password.errors?.['minlength'] && (Password.dirty || Password.touched)"
+            >
+              Password must be 6 length.
+            </div>
+            <div
+              class="text-red-500"
+              *ngIf="Password.errors?.['maxlength'] && (Password.dirty || Password.touched)"
+            >
+              Password can't be more than 15 length.
+            </div>
+          </div>
+
+          <div class="flex justify-evenly">
+            <button
+              type="submit"
+              mat-raised-button
+              color="primary"
+              class="my-14"
+              [disabled]="loginForm.invalid"
+            >
+              <span class="px-10 text-white text-lg">Sign In</span>
+            </button>
+            <button
+              type="button"
+              mat-raised-button
+              color="warn"
+              class="my-14"
+              routerLink="/dashboard"
+            >
+              <span class="px-3 text-white text-lg">Back To Home</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

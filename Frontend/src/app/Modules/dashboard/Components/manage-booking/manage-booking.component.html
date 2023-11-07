@@ -1,0 +1,541 @@
+<app-header [pageTitle]="title"></app-header>
+
+<div class="container mt-7">
+  <div
+    *ngIf="!bookingDetails.id && !isLoading"
+    class="w-1/2 mx-auto py-5 px-10 bg-sky-200 border-2 border-sky-700 rounded-xl shadow-xl shadow-blue-300/50"
+  >
+    <h2 class="text-center underline font-medium text-lime-800">
+      Find Your Booking Details
+    </h2>
+    <form
+      method="post"
+      [formGroup]="searchForm"
+      (ngSubmit)="submitSearchForm()"
+      class="text-sky-700 font-medium"
+    >
+      <div class="my-2">
+        <span class="text-xl inline-block w-1/3">Reference Number</span>
+        <input
+          class="w-1/3 bg-transparent rounded-md border-2 border-sky-700 p-1 outline-none"
+          type="text"
+          formControlName="refNum"
+        />
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="RefNum.errors?.['required'] && (RefNum.dirty || RefNum.touched)"
+        >
+          RefNum is Required. Please enter your RefNum.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="RefNum.errors?.['pattern'] && (RefNum.dirty || RefNum.touched)"
+        >
+          RefNum is not correct. Please enter correct RefNum.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="RefNum.errors?.['minlength'] && (RefNum.dirty || RefNum.touched)"
+        >
+          RefNum must be 8 length.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="RefNum.errors?.['maxlength'] && (RefNum.dirty || RefNum.touched)"
+        >
+          RefNum not greater than 8 length.
+        </div>
+      </div>
+      <div class="my-2">
+        <span class="text-xl inline-block w-1/3">ZipCode</span>
+        <input
+          class="w-1/3 bg-transparent rounded-md border-2 border-sky-700 p-1 outline-none"
+          type="text"
+          formControlName="zipcode"
+        />
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="Zipcode.errors?.['required'] && (Zipcode.dirty || Zipcode.touched)"
+        >
+          Zipcode is Required. Please enter your Zipcode.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="Zipcode.errors?.['pattern'] && (Zipcode.dirty || Zipcode.touched)"
+        >
+          Zipcode must be only number. Please enter correct Zipcode.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="Zipcode.errors?.['minlength'] && (Zipcode.dirty || Zipcode.touched)"
+        >
+          Zipcode must be 6 length.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="Zipcode.errors?.['maxlength'] && (Zipcode.dirty || Zipcode.touched)"
+        >
+          Zipcode not greater than 6 length.
+        </div>
+      </div>
+      <div class="my-2">
+        <span class="text-xl inline-block w-1/3">Cell Phone</span>
+        <input
+          class="w-1/3 bg-transparent rounded-md border-2 border-sky-700 p-1 outline-none"
+          type="text"
+          formControlName="cellphone"
+        />
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="CellPhone.errors?.['required'] && (CellPhone.dirty || CellPhone.touched)"
+        >
+          CellPhone is Required. Please enter your CellPhone.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="CellPhone.errors?.['pattern'] && (CellPhone.dirty || CellPhone.touched)"
+        >
+          CellPhone must be only number. Please enter correct CellPhone.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="CellPhone.errors?.['minlength'] && (CellPhone.dirty || CellPhone.touched)"
+        >
+          CellPhone must be 10 length.
+        </div>
+        <div
+          class="text-red-500 mx-48"
+          *ngIf="CellPhone.errors?.['maxlength'] && (CellPhone.dirty || CellPhone.touched)"
+        >
+          CellPhone not greater than 10 length.
+        </div>
+      </div>
+      <div class="my-3 mt-5 text-center">
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="searchForm.invalid"
+        >
+          <span class="mx-3">Fetch Booking Details</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div
+    *ngIf="isLoading"
+    class="w-1/2 mx-auto py-5 px-10 bg-sky-200 border-2 border-sky-700 rounded-xl shadow-xl shadow-blue-300/50"
+  >
+    <h3 class="text-center font-medium text-green-800">Please Wait</h3>
+    <div class="flex items-center justify-center space-x-2">
+      <div
+        class="spinner-border animate-spin inline-block w-36 h-36 border-4 rounded-full"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="bookingDetails.id"
+    class="w-2/3 mx-auto py-5 px-10 bg-green-200 border-2 border-sky-700 rounded-xl shadow-xl shadow-lime-300/50"
+  >
+    <h2 class="text-center underline font-medium text-lime-800">
+      Booking Details
+    </h2>
+    <div class="text-cyan-700 font-medium my-5 text-center">
+      <div class="flex flex-col">
+        <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+            <div class="overflow-hidden">
+              <table class="min-w-full">
+                <thead class="bg-white border-b">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="text-sm font-medium text-gray-900 py-4 text-right"
+                    >
+                      Booking
+                    </th>
+                    <th
+                      scope="col"
+                      class="text-sm font-medium text-gray-900 py-4 text-left"
+                    >
+                      Recipt
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Id
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.id }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Camp Id
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.campId }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Reference Number
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.referenceNumber }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Total Price
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.price }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Total Person
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.persons }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Total Nights
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.nights }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      CheckIn Date
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.checkIn }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      CheckOut Date
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.checkOut }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Billing Address
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.address }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      State
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.state }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Country
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.country }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      ZipCode
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.zipCode }}
+                    </td>
+                  </tr>
+                  <tr
+                    class="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                    >
+                      Cell Phone
+                    </td>
+                    <td
+                      class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                    >
+                      {{ bookingDetails.cellPhone }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="my-10 px-10 flex justify-between">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        [disabled]="bookingDetails.checkOut > today"
+        data-bs-toggle="modal"
+        data-bs-target="#ratingModal"
+      >
+        <span class="mx-3">Give Rating</span>
+      </button>
+      <button
+        class="mx-10"
+        mat-raised-button
+        color="warn"
+        [disabled]="bookingDetails.checkIn < today"
+        type="button"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        <span class="mx-3">Cancle Booking</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<footer
+  class="mat-footer-cell container w-full text-center bg-gray-500 text-white mt-5"
+>
+  <p class="mx-auto py-3">Valley Forge Camp Booking | Thank You. Visit Again</p>
+</footer>
+
+<!-- delete modal  -->
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-red-100 bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-red-400 rounded-t-md"
+      >
+        <h2
+          class="text-xl font-medium leading-normal text-gray-800"
+          id="exampleModalLabel"
+        >
+          Please check once again before delete your booking!
+        </h2>
+      </div>
+      <div class="modal-body relative p-4">
+        <p class="text-red-600 text-2xl font-medium">Are you Sure?</p>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-red-400 rounded-b-md"
+      >
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+        >
+          <span class="mx-3">Check Again</span>
+        </button>
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          data-bs-dismiss="modal"
+          (click)="DeleteBooking()"
+        >
+          <span class="mx-3">Delete Booking</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- rating modal -->
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="ratingModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-gray-100 bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-blue-400 rounded-t-md"
+      >
+        <h2
+          class="text-xl font-medium leading-normal text-gray-800"
+          id="exampleModalLabel2"
+        >
+          Give your valuable Feedback!
+        </h2>
+      </div>
+      <div class="modal-body relative p-4">
+        <form method="post" #form="ngForm">
+          <span>Camp Id </span>
+          <input
+            type="text"
+            name="campId"
+            [(ngModel)]="campId$"
+            placeholder="Enter CampId"
+            readonly
+            class="p-1 px-3 my-2 outline-none w-full border-2 border-blue-400 rounded-lg cursor-not-allowed"
+          />
+          <span>Reference Number</span>
+          <input
+            type="text"
+            name="referenceNumber"
+            placeholder="Enter Reference Number"
+            [(ngModel)]="refNum$"
+            readonly
+            class="p-1 px-3 my-2 outline-none w-full border-2 border-blue-400 rounded-lg cursor-no-drop"
+          />
+          <span>Cell Phone</span>
+          <input
+            type="text"
+            name="cellPhone"
+            [(ngModel)]="cellPhone$"
+            placeholder="Enter Cell Phone"
+            readonly
+            class="p-1 px-3 my-2 outline-none w-full border-2 border-blue-400 rounded-lg cursor-not-allowed"
+          />
+          <span>Give your star (out of 5)</span>
+          <input
+            type="number"
+            [min]="1"
+            [max]="5"
+            name="star"
+            placeholder="Give Rating"
+            [(ngModel)]="star$"
+            class="p-1 px-3 my-2 outline-none w-full border-2 border-blue-400 rounded-lg"
+          />
+          <span>Anything you want to share to us.</span>
+          <textarea
+            name="comment"
+            id="comment"
+            cols="60"
+            rows="5"
+            class="my-2 p-1 px-3 outline-none border-2 border-blue-400 rounded-lg"
+            placeholder="Comment"
+            [(ngModel)]="coment$"
+          ></textarea>
+        </form>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-blue-400 rounded-b-md"
+      >
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+          (click)="giveRating()"
+        >
+          <span class="mx-3">Give Rating</span>
+        </button>
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          data-bs-dismiss="modal"
+        >
+          <span class="mx-3">Cancle</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

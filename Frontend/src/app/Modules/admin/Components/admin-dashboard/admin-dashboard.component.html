@@ -1,0 +1,360 @@
+<app-header pageTitle="Manage Camps"></app-header>
+
+<div class="container mt-5 w-5/6 mx-auto">
+  <div class="flex justify-between align-baseline w-full">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="addDisable = false"
+      data-bs-toggle="modal"
+      data-bs-target="#addEditModal"
+    >
+      <span class="mx-5">Add New Camp</span>
+    </button>
+
+    <!-- name: {{number}} matches found -->
+    <h1 *ngIf="name">
+      <span class="font-medium underline decoration-3 decoration-slate-400"
+        >{{ name }} : {{ matches }} matches found</span
+      >
+    </h1>
+
+    <input
+      type="text"
+      class="form-control outline-none border-2 border-gray-500 rounded-lg px-3 text-md p-1 w-1/3"
+      name="name"
+      [(ngModel)]="name"
+      (ngModelChange)="Search()"
+      placeholder="Enter Name to Search"
+    />
+  </div>
+
+  <div class="flex flex-col">
+    <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+        <div class="overflow-hidden">
+          <table class="min-w-full">
+            <thead class="bg-white border-b">
+              <tr>
+                <th
+                  scope="col"
+                  class="text-lg font-medium text-gray-900 px-6 py-4 text-left"
+                >
+                  Image
+                </th>
+                <th
+                  scope="col"
+                  class="text-lg font-medium text-gray-900 px-6 py-4 text-left"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  class="text-lg font-medium text-gray-900 px-6 py-4 text-left"
+                  (click)="sort('capacity')"
+                >
+                  Max Person &nbsp; <i class="fa fa-sort"></i>
+                </th>
+                <th
+                  scope="col"
+                  class="text-lg font-medium text-gray-900 px-6 py-4 text-left"
+                  (click)="sort('price')"
+                >
+                  Price &nbsp; <i class="fa fa-sort"></i>
+                </th>
+                <th
+                  scope="col"
+                  class="text-lg font-medium text-gray-900 px-6 py-4 text-left"
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="bg-gray-100 border-b"
+                *ngFor="
+                  let item of campList
+                    | orderBy : key : reverse
+                    | paginate
+                      : { itemsPerPage: itemsPerPage, currentPage: page }
+                "
+              >
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                >
+                  <img
+                    src="{{ item.imageUrl }}"
+                    alt="Camp Image"
+                    width="70px"
+                    class="object-fill hover:scale-150 transition duration-300 ease-in-out"
+                  />
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                >
+                  {{ item.name }}
+                </td>
+                <td
+                  class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                >
+                  {{ item.capacity }}
+                </td>
+                <td
+                  class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                >
+                  {{ item.price }}
+                </td>
+                <td
+                  class="text-sm text-gray-900 font-medium px-6 py-4 whitespace-nowrap"
+                >
+                  <span
+                    class="hover:shadow-lg hover:shadow-sky-500 hover:bg-blue-100"
+                    ><i
+                      routerLink="/dashboard/booking-screen/{{ item.id }}"
+                      class="fas fa-share fa-2x text-blue-600 cursor-pointer"
+                    ></i
+                  ></span>
+                  <span
+                    class="mx-5 hover:shadow-xl hover:shadow-yellow-500 hover:bg-lime-100"
+                    ><i
+                      data-bs-toggle="modal"
+                      data-bs-target="#addEditModal"
+                      (click)="fetchDetails(item.id)"
+                      class="fas fa-edit fa-2x text-yellow-600 cursor-pointer"
+                    ></i
+                  ></span>
+                  <span
+                    class="hover:shadow-xl hover:shadow-red-500 hover:bg-orange-100"
+                    ><i
+                      data-bs-toggle="modal"
+                      data-bs-target="#staticBackdrop"
+                      (click)="selectedCampId = item.id"
+                      class="fas fa-trash-can fa-2x text-red-600 cursor-pointer"
+                    ></i
+                  ></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- pagination -->
+          <div class="px-10 pt-2 flex justify-between">
+            <div>
+              Items per page :
+              <select
+                name="itemsPerPage"
+                id="itemsPerPage"
+                [(ngModel)]="itemsPerPage"
+                (ngModelChange)="onPageChange($event)"
+                class="px-5 p-2 outline-none border-2 border-gray-300 rounded-lg"
+              >
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            <pagination-controls
+              (pageChange)="page = $event"
+            ></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- delete modal  -->
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-red-100 bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-red-400 rounded-t-md"
+      >
+        <h2
+          class="text-xl font-medium leading-normal text-gray-800"
+          id="exampleModalLabel"
+        >
+          Please check once again before delete your camp!
+        </h2>
+      </div>
+      <div class="modal-body relative p-4">
+        <p class="text-red-600 text-2xl font-medium">Are you Sure?</p>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-red-400 rounded-b-md"
+      >
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+        >
+          <span class="mx-3">Check Again</span>
+        </button>
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          data-bs-dismiss="modal"
+          (click)="removeCamp()"
+        >
+          <span class="mx-3">Delete Camp</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- add edit modal  -->
+<div
+  class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+  id="addEditModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog relative w-auto pointer-events-none">
+    <div
+      class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-red-100 bg-clip-padding rounded-md outline-none text-current"
+    >
+      <div
+        class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-sky-400 rounded-t-md"
+      >
+        <h2
+          *ngIf="!addDisable"
+          class="text-xl font-medium leading-normal text-center text-gray-800"
+          id="exampleModalLabel"
+        >
+          Add New Camp
+        </h2>
+        <h2
+          *ngIf="addDisable"
+          class="text-xl font-medium leading-normal text-center text-gray-800"
+          id="exampleModalLabel"
+        >
+          Update Camp Details
+        </h2>
+      </div>
+      <div class="modal-body relative p-4">
+        <form method="post" class="text-center" #form="ngForm">
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Id : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.id"
+              name="id"
+              id="id"
+              readonly
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent cursor-not-allowed"
+            />
+          </div>
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Name : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.name"
+              name="name"
+              id="name"
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent"
+            />
+          </div>
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Description : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.description"
+              name="description"
+              id="description"
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent"
+            />
+          </div>
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Price : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.price"
+              name="price"
+              id="price"
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent"
+            />
+          </div>
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Capacity : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.capacity"
+              name="capacity"
+              id="capacity"
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent"
+            />
+          </div>
+          <div
+            class="my-2 text-blue-600 font-medium flex justify-between w-full"
+          >
+            <span class="w-1/3 p-1 text-left">Image Url : </span>
+            <input
+              type="text"
+              [(ngModel)]="camp.imageUrl"
+              name="imageUrl"
+              id="imageUrl"
+              class="p-1 px-3 w-2/3 mx-3 outline-none border-2 border-sky-700 rounded-lg bg-transparent"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-sky-400 rounded-b-md"
+      >
+        <button
+          type="button"
+          class="inline-block px-6 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-lime-700 hover:shadow-lg focus:bg-lime-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+          (click)="cancleBtn()"
+        >
+          <span class="mx-3">Back To List</span>
+        </button>
+        <button
+          *ngIf="addDisable"
+          type="button"
+          class="inline-block px-6 py-2.5 mx-5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out"
+          data-bs-dismiss="modal"
+          (click)="editCamp()"
+        >
+          <span class="mx-3">Update Camp Details</span>
+        </button>
+        <button
+          *ngIf="!addDisable"
+          type="button"
+          class="inline-block px-6 py-2.5 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+          data-bs-dismiss="modal"
+          (click)="addCamp()"
+        >
+          <span class="mx-3">Add This Camp</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
