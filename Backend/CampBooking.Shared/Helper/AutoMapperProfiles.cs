@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CampBooking.DAL.DbModel;
 using CampBooking.Domain.DTOs;
+using CampBooking.Domain.Entities;
 
 namespace CampBooking.Shared.Helper
 {

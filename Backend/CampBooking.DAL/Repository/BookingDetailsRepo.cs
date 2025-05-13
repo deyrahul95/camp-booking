@@ -1,6 +1,6 @@
 ﻿using CampBooking.DAL.DB;
-using CampBooking.DAL.DbModel;
 using CampBooking.DAL.Interfaces;
+using CampBooking.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using CampBooking.DAL.DbModel;
 using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.DTOs;
+using CampBooking.Domain.Entities;
 using CampBooking.Service.Interfaces;
 
 namespace CampBooking.Service.Services

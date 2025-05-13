@@ -1,4 +1,4 @@
-﻿using CampBooking.DAL.DbModel;
+﻿using CampBooking.Domain.Entities;
 
 namespace CampBooking.DAL.Interfaces
 {
