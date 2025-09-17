@@ -52,3 +52,15 @@ Run the project by running the bellow command and visit this url "https://localh
 ```
 dotnet watch
 ```
+
+### TODOS
+
+ - Upgrade packages to latest version
+ - Add DB connection string and migrations
+ - Add postman collections
+ - Update Readme file with correct instruction for local setup 
+ - Add docker file
+ - Create v0 docker image and push into docker hub
+ - Add logging with serilog and SEQ
+ - Add Unit and End-to-end testing using in-memory db or test db
+ - Update business logic in terms of design pattern and future scope
