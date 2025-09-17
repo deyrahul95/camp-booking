@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampBooking.Domain.DTOs;
 
-namespace CampBooking.Domain.DTOs
-{
-    public class CheckForFreeDTO
-    {
-        public Guid CampId { get; set; }
-        public string CheckIn { get; set; }
-        public string CheckOut { get; set; }
-    }
-}
+/// <summary>
+/// Represents a data transfer object (DTO) for checking the availability of a camping location.
+/// </summary>
+/// <param name="CampId">The unique identifier of the camping location to check for availability.</param>
+/// <param name="CheckIn">The proposed check-in date as a string, representing the start of the potential booking.</param>
+/// <param name="CheckOut">The proposed check-out date as a string, representing the end of the potential booking.</param>
+public record CheckForFreeDTO(
+    Guid CampId,
+    string CheckIn,
+    string CheckOut);

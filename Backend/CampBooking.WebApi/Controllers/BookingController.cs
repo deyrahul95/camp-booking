@@ -57,8 +57,8 @@ namespace CampBooking.WebApi.Controllers
         [Route("search-booking")]
         public async Task<IActionResult> SearchBooking(SearchBookingDTO _searchBook)
         {
-            var result = await service.SearchBooking(_searchBook.RefNum, _searchBook.Phone, _searchBook.Zipcode);
-            if(result == null)
+            var result = await service.SearchBooking(_searchBook.RefNum, _searchBook.Phone, _searchBook.ZipCode);
+            if (result == null)
             {
                 return Ok("Not Found");
             }

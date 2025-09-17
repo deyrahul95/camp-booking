@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampBooking.Domain.DTOs;
 
-namespace CampBooking.Domain.DTOs
-{
-    public class UserDetails
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public bool IsAdmin { get; set; }
-    }
-}
+/// <summary>
+/// Represents a data transfer object (DTO) containing user account details.
+/// </summary>
+/// <param name="Id">The unique identifier of the user.</param>
+/// <param name="Name">The user's display name.</param>
+/// <param name="Email">The user's email address.</param>
+/// <param name="Password">The user's account password.</param>
+/// <param name="IsAdmin">A flag indicating whether the user has administrative privileges.</param>
+public record UserDetails(
+    int Id,
+    string Name,
+    string Email,
+    string Password,
+    bool IsAdmin);

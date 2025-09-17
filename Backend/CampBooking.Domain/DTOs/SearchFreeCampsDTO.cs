@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampBooking.Domain.DTOs;
 
-namespace CampBooking.Domain.DTOs
-{
-    public class SearchFreeCampsDTO
-    {
-        public string CheckIn { get; set; }
-        public string CheckOut { get; set; }
-    }
-}
+/// <summary>
+/// Represents a data transfer object (DTO) for searching available camping locations within a specific date range.
+/// </summary>
+/// <param name="CheckIn">The proposed check-in date as a string, representing the start of the desired booking period.</param>
+/// <param name="CheckOut">The proposed check-out date as a string, representing the end of the desired booking period.</param>
+public record SearchFreeCampsDTO(string CheckIn, string CheckOut);

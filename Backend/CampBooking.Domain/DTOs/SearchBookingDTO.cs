@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CampBooking.Domain.DTOs;
 
-namespace CampBooking.Domain.DTOs
-{
-    public class SearchBookingDTO
-    {
-        public string RefNum { get; set; }
-        public string Phone { get; set; }
-        public string Zipcode { get; set; }
-    }
-}
+/// <summary>
+/// Represents a data transfer object (DTO) for searching booking information.
+/// </summary>
+/// <param name="RefNum">The reference number of the booking to search for.</param>
+/// <param name="Phone">The contact phone number associated with the booking.</param>
+/// <param name="ZipCode">The postal code or ZIP code of the booking location.</param>
+public record SearchBookingDTO(string RefNum, string Phone, string ZipCode);
