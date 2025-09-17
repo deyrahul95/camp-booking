@@ -4,123 +4,147 @@ using CampBooking.Domain.DTOs;
 using CampBooking.Domain.Entities;
 using CampBooking.Service.Interfaces;
 
-namespace CampBooking.Service.Services
+namespace CampBooking.Service.Services;
+
+/// <summary>
+/// Service class for managing rating operations.
+/// Implements the IRatingService interface.
+/// </summary>
+/// <param name="uow">The unit of work instance used for database operations.</param>
+/// <param name="mapper">The mapper instance used for mapping between entities and DTOs.</param>
+public class RatingService(IUnitOfWork uow, IMapper mapper) : IRatingService
 {
-    public class RatingService : IRatingService
+    /// <summary>
+    /// Retrieves the rating for a specific camp by its unique identifier.
+    /// </summary>
+    /// <param name="campId">The unique identifier of the camp.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the rating as an integer.</returns>
+    public async Task<int> GetRating(Guid campId)
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        var list = await uow.RatingRepository.GetAllRatings();
+        int count = 0;
+        double rating = 0;
 
-        public RatingService(IUnitOfWork uow, IMapper mapper)
+        foreach (var item in list)
         {
-            _uow = uow ?? throw new ArgumentNullException(nameof(uow));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
-        public async Task<int> GetRating(Guid _campId)
-        {
-            var list = await _uow.RatingRepository.GetAllRatings();
-            int count = 0;
-            double rating = 0;
-
-            foreach (var item in list)
+            if (item.CampId == campId)
             {
-                if(item.CampId == _campId)
+                if (item.Star > 0)
                 {
-                    if(item.Star > 0)
-                    {
-                        rating += item.Star;
-                        count++;
-                    }
+                    rating += item.Star;
+                    count++;
                 }
             }
-
-            if(count == 0 )
-            {
-                return 0;
-            }
-            
-            return (int)Math.Round(rating/count);
         }
 
-        public async Task<RatingDTO> SearchRating(SearchRatingDTO _data)
+        if (count == 0)
         {
-            var list = await _uow.RatingRepository.GetAllRatings();
+            return 0;
+        }
 
-            foreach (var item in list)
+        return (int)Math.Round(rating / count);
+    }
+
+    /// <summary>
+    /// Searches for a rating based on the provided search criteria.
+    /// </summary>
+    /// <param name="data">The search criteria for finding ratings.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the found rating details DTO.</returns>
+    public async Task<RatingDTO> SearchRating(SearchRatingDTO data)
+    {
+        var list = await uow.RatingRepository.GetAllRatings();
+
+        foreach (var item in list)
+        {
+            if (item.CampId == data.CampId
+                && item.CellPhone == data.CellPhone
+                && item.ReferenceNumber == data.ReferenceNumber)
             {
-                if(item.CampId == _data.CampId && item.CellPhone == _data.CellPhone && item.ReferenceNumber == _data.ReferenceNumber)
-                {
-                    return _mapper.Map<RatingDTO>(item);
-                }
+                return mapper.Map<RatingDTO>(item);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Adds a new rating.
+    /// </summary>
+    /// <param name="rating">The rating information to be added.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the added rating details DTO.</returns>
+    public async Task<AddRatingDTO> AddNewRating(AddRatingDTO rating)
+    {
+        var mapped = mapper.Map<Rating>(rating) ?? throw new Exception($"Entity could not be mapped.");
+        mapped.Id = Guid.NewGuid();
+
+        try
+        {
+            Guid id = await uow.RatingRepository.AddRating(mapped);
+            var camp = await uow.CampRepository.ViewDetails(rating.CampId);
+            camp.Rating = await GetRating(camp.Id);
+            bool res = await uow.SaveAsync();
+
+            if (id != Guid.Empty && res)
+            {
+                return rating;
             }
 
             return null;
         }
-
-        public async Task<AddRatingDTO> AddNewRating(AddRatingDTO _rating)
+        catch (Exception e)
         {
-            var mapped = _mapper.Map<Rating>(_rating);
-            if (mapped == null)
+            throw new Exception(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Updates an existing rating by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the rating to be updated.</param>
+    /// <param name="rating">The updated rating information.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the updated rating details DTO.</returns>
+    public async Task<RatingDTO> UpdateRating(Guid id, RatingDTO rating)
+    {
+        var mapped = mapper.Map<Rating>(rating) ?? throw new Exception($"Entity could not be mapped.");
+
+        try
+        {
+            var existingRating = await uow.RatingRepository.UpdateRating(id, mapped);
+            var camp = await uow.CampRepository.ViewDetails(rating.CampId);
+            camp.Rating = await GetRating(camp.Id);
+            bool res = await uow.SaveAsync();
+
+            if (res && existingRating != null)
             {
-                throw new Exception($"Entity could not be mapped.");
+                return mapper.Map<RatingDTO>(existingRating);
             }
-            mapped.Id = Guid.NewGuid();
-            try
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves comments associated with a specific camp by its unique identifier.
+    /// </summary>
+    /// <param name="campId">The unique identifier of the camp.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a list of comments.</returns>
+    public async Task<IList<string>> GetComments(Guid campId)
+    {
+        var list = await uow.RatingRepository.GetAllRatings();
+        var comments = new List<string>();
+
+        foreach (var item in list)
+        {
+            if (item.CampId == campId)
             {
-                Guid id = await _uow.RatingRepository.AddRating(mapped);
-                var camp = await _uow.CampRepository.ViewDetails(_rating.CampId);
-                camp.Rating = await GetRating(camp.Id); 
-                bool res = await _uow.SaveAsync();
-                if (id != Guid.Empty && res)
-                {
-                    return _rating;
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
+                comments.Add(item.Comment);
             }
         }
 
-        public async Task<RatingDTO> UpdateRating(Guid id, RatingDTO _rating)
-        {
-            var mapped = _mapper.Map<Rating>(_rating);
-            if (mapped == null)
-            {
-                throw new Exception($"Entity could not be mapped.");
-            }
-            try
-            {
-                var rating = await _uow.RatingRepository.UpdateRating(id, mapped);
-                var camp = await _uow.CampRepository.ViewDetails(_rating.CampId);
-                camp.Rating = await GetRating(camp.Id);
-                bool res = await _uow.SaveAsync();
-
-                if (res && rating != null)
-                {
-                    return _mapper.Map<RatingDTO>(rating);
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
-        public async Task<IList<string>> GetComments(Guid _campId)
-        {
-            var list = await _uow.RatingRepository.GetAllRatings();
-            var comments = new List<string>();
-            foreach (var item in list)
-            {   
-                if(item.CampId == _campId)
-                {
-                    comments.Add(item.Comment);
-                }
-            }
-            return comments;
-        }
+        return comments;
     }
 }
