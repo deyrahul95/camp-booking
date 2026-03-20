@@ -18,7 +18,7 @@ public interface ICampRepository
     /// </summary>
     /// <param name="Id">The unique identifier of the camp.</param>
     /// <returns>A task that resolves to the matching <c>Camp</c> instance.</returns>
-    Task<Camp> ViewDetails(Guid Id);
+    Task<Camp?> ViewDetails(Guid Id);
 
     /// <summary>
     /// Adds a new camp to the data store.
@@ -33,7 +33,7 @@ public interface ICampRepository
     /// <param name="Id">The identifier of the camp to edit.</param>
     /// <param name="camp">The updated camp data.</param>
     /// <returns>A task that resolves to the updated <c>Camp</c> instance.</returns>
-    Task<Camp> EditCamp(Guid Id, Camp camp);
+    Task<Camp?> EditCamp(Guid Id, Camp camp);
 
     /// <summary>
     /// Deletes a camp.

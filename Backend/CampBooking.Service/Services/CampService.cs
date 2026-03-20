@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using CampBooking.DAL.Interfaces;
+﻿using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.Camps.DTOs;
 using CampBooking.Domain.Camps.Entity;
 using CampBooking.Service.Interfaces;
+using CampBooking.Shared.Mappers;
 
 namespace CampBooking.Service.Services;
 
@@ -11,8 +11,7 @@ namespace CampBooking.Service.Services;
 /// Implements the ICampService interface.
 /// </summary>
 /// <param name="uow">The unit of work instance used for database operations.</param>
-/// <param name="mapper">The mapper instance used for mapping between entities and DTOs.</param>
-public class CampService(IUnitOfWork uow, IMapper mapper) : ICampService
+public class CampService(IUnitOfWork uow) : ICampService
 {
     /// <summary>
     /// Retrieves all camps.
@@ -20,9 +19,8 @@ public class CampService(IUnitOfWork uow, IMapper mapper) : ICampService
     /// <returns>A task that represents the asynchronous operation, containing a list of camp details DTOs.</returns>
     public async Task<IList<CampDetailsDTO>> GetAllCamps()
     {
-        var list = await uow.CampRepository.GetCamps();
-        var mapped = mapper.Map<IList<CampDetailsDTO>>(list) ?? throw new Exception($"Entity could not be mapped.");
-        return mapped;
+        var camps = await uow.CampRepository.GetCamps();
+        return camps.ToDtoList();
     }
 
     /// <summary>
@@ -30,11 +28,16 @@ public class CampService(IUnitOfWork uow, IMapper mapper) : ICampService
     /// </summary>
     /// <param name="Id">The unique identifier of the camp.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested camp details DTO.</returns>
-    public async Task<CampDetailsDTO> ViewCampDetails(Guid Id)
+    public async Task<CampDetailsDTO?> ViewCampDetails(Guid Id)
     {
-        var result = await uow.CampRepository.ViewDetails(Id);
-        var mapped = mapper.Map<CampDetailsDTO>(result) ?? throw new Exception($"Entity could not be mapped.");
-        return mapped;
+        var campDetails = await uow.CampRepository.ViewDetails(Id);
+
+        if (campDetails is not null)
+        {
+            return campDetails.ToDetailsDTO();
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -42,14 +45,13 @@ public class CampService(IUnitOfWork uow, IMapper mapper) : ICampService
     /// </summary>
     /// <param name="campDetails">The camp details to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing the added camp details DTO.</returns>
-    public async Task<AddCampDTO> AddNewCamp(AddCampDTO campDetails)
+    public async Task<AddCampDTO?> AddNewCamp(AddCampDTO campDetails)
     {
-        var mapped = mapper.Map<Camp>(campDetails) ?? throw new Exception($"Entity could not be mapped.");
-        mapped.Id = Guid.NewGuid();
+        var newCamp = campDetails.ToEntity();
 
         try
         {
-            Guid id = await uow.CampRepository.AddCamp(mapped);
+            Guid id = await uow.CampRepository.AddCamp(newCamp);
             bool res = await uow.SaveAsync();
 
             if (id != Guid.Empty && res)
@@ -71,18 +73,18 @@ public class CampService(IUnitOfWork uow, IMapper mapper) : ICampService
     /// <param name="id">The unique identifier of the camp to be edited.</param>
     /// <param name="campDetails">The updated camp details.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated camp details DTO.</returns>
-    public async Task<CampDetailsDTO> EditCamp(Guid id, CampDetailsDTO campDetails)
+    public async Task<CampDetailsDTO?> EditCamp(Guid id, CampDetailsDTO campDetails)
     {
-        var mapped = mapper.Map<Camp>(campDetails) ?? throw new Exception($"Entity could not be mapped.");
+        var camp = campDetails.ToEntity();
 
         try
         {
-            var camp = await uow.CampRepository.EditCamp(id, mapped);
+            var updatedCamp = await uow.CampRepository.EditCamp(id, camp);
             bool res = await uow.SaveAsync();
 
-            if (res && camp != null)
+            if (res && updatedCamp != null)
             {
-                return mapper.Map<CampDetailsDTO>(camp);
+                return updatedCamp.ToDetailsDTO();
             }
 
             return null;

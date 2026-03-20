@@ -19,14 +19,14 @@ public interface IRatingService
     /// </summary>
     /// <param name="data">The search criteria for finding ratings.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found rating details DTO.</returns>
-    Task<RatingDTO> SearchRating(SearchRatingDTO data);
+    Task<RatingDTO?> SearchRating(SearchRatingDTO data);
 
     /// <summary>
     /// Adds a new rating.
     /// </summary>
     /// <param name="rating">The rating information to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing the added rating details DTO.</returns>
-    Task<AddRatingDTO> AddNewRating(AddRatingDTO rating);
+    Task<AddRatingDTO?> AddNewRating(AddRatingDTO rating);
 
     /// <summary>
     /// Updates an existing rating by its unique identifier.
@@ -34,7 +34,7 @@ public interface IRatingService
     /// <param name="id">The unique identifier of the rating to be updated.</param>
     /// <param name="rating">The updated rating information.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated rating details DTO.</returns>
-    Task<RatingDTO> UpdateRating(Guid id, RatingDTO rating);
+    Task<RatingDTO?> UpdateRating(Guid id, RatingDTO rating);
 
     /// <summary>
     /// Retrieves comments associated with a specific camp by its unique identifier.

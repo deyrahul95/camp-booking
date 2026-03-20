@@ -18,14 +18,14 @@ public interface ICampService
     /// </summary>
     /// <param name="Id">The unique identifier of the camp.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested camp details DTO.</returns>
-    Task<CampDetailsDTO> ViewCampDetails(Guid Id);
+    Task<CampDetailsDTO?> ViewCampDetails(Guid Id);
 
     /// <summary>
     /// Adds a new camp with the provided details.
     /// </summary>
     /// <param name="campDetails">The camp details to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing the added camp details DTO.</returns>
-    Task<AddCampDTO> AddNewCamp(AddCampDTO campDetails);
+    Task<AddCampDTO?> AddNewCamp(AddCampDTO campDetails);
 
     /// <summary>
     /// Edits an existing camp's details.
@@ -33,7 +33,7 @@ public interface ICampService
     /// <param name="id">The unique identifier of the camp to be edited.</param>
     /// <param name="campDetails">The updated camp details.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated camp details DTO.</returns>
-    Task<CampDetailsDTO> EditCamp(Guid id, CampDetailsDTO campDetails);
+    Task<CampDetailsDTO?> EditCamp(Guid id, CampDetailsDTO campDetails);
 
     /// <summary>
     /// Deletes camp details by its unique identifier.

@@ -19,5 +19,5 @@ public interface IUserRepository
     /// </summary>
     /// <param name="email">The email address of the user to find.</param>
     /// <returns>The user associated with the specified email, or null if not found.</returns>
-    User FindUserByEmail(string email);
+    User? FindUserByEmail(string email);
 }

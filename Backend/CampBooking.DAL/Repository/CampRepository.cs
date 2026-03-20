@@ -26,7 +26,7 @@ public class CampRepository(CampDBContext context) : ICampRepository
     /// </summary>
     /// <param name="Id">The unique identifier of the camp.</param>
     /// <returns>A task that resolves to the matching <c>Camp</c> instance.</returns>
-    public async Task<Camp> ViewDetails(Guid Id)
+    public async Task<Camp?> ViewDetails(Guid Id)
     {
         return await context.Camps.FindAsync(Id);
     }
@@ -58,7 +58,7 @@ public class CampRepository(CampDBContext context) : ICampRepository
     /// <param name="Id">The identifier of the camp to edit.</param>
     /// <param name="camp">The updated camp data.</param>
     /// <returns>A task that resolves to the updated <c>Camp</c> instance.</returns>
-    public async Task<Camp> EditCamp(Guid Id, Camp camp)
+    public async Task<Camp?> EditCamp(Guid Id, Camp camp)
     {
         var existingCamp = await ViewDetails(Id);
 

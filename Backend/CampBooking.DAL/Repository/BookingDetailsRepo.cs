@@ -26,7 +26,7 @@ public class BookingDetailsRepo(CampDBContext context) : IBookingDetailsRepo
     /// </summary>
     /// <param name="Id">The unique identifier of the booking detail.</param>
     /// <returns>A task that resolves to the matching <c>BookingDetails</c> instance.</returns>
-    public async Task<BookingDetails> GetBookingDetails(Guid Id)
+    public async Task<BookingDetails?> GetBookingDetails(Guid Id)
     {
         return await context.BookingDetails.FindAsync(Id);
     }
@@ -69,6 +69,12 @@ public class BookingDetailsRepo(CampDBContext context) : IBookingDetailsRepo
         try
         {
             var book = await context.BookingDetails.FindAsync(Id);
+
+            if (book is null)
+            {
+                return false;
+            }
+
             context.BookingDetails.Remove(book);
             return true;
         }

@@ -1,4 +1,4 @@
-﻿namespace CampBooking.Shared.HelperFunctions;
+﻿namespace CampBooking.Shared.Helpers;
 
 /// <summary>
 /// Provides functionality to generate a reference number based on a GUID,

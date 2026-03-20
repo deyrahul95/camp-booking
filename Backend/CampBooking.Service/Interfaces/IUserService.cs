@@ -19,5 +19,5 @@ public interface IUserService
     /// </summary>
     /// <param name="email">The email address of the user.</param>
     /// <returns>The details of the user associated with the specified email.</returns>
-    LoginUserDetails GetUserDetails(string email);
+    LoginUserDetails? GetUserDetails(string email);
 }

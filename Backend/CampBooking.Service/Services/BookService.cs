@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using CampBooking.DAL.Interfaces;
+﻿using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.Bookings.DTOs;
 using CampBooking.Domain.Bookings.Entity;
 using CampBooking.Domain.Camps.DTOs;
 using CampBooking.Service.Interfaces;
-using CampBooking.Shared.HelperFunctions;
+using CampBooking.Shared.Helpers;
+using CampBooking.Shared.Mappers;
 
 namespace CampBooking.Service.Services;
 
@@ -13,8 +13,7 @@ namespace CampBooking.Service.Services;
 /// Implements the IBookService interface.
 /// </summary>
 /// <param name="uow">The unit of work instance used for database operations.</param>
-/// <param name="mapper">The mapper instance used for mapping between entities and DTOs.</param>
-public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
+public class BookService(IUnitOfWork uow) : IBookService
 {
     /// <summary>
     /// Retrieves all booking details.
@@ -22,11 +21,8 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// <returns>A task that represents the asynchronous operation, containing a list of booking details DTOs.</returns>
     public async Task<IList<BookingDetailsDTO>> GetAllBookingDetails()
     {
-        var list = await uow.BookingDetailsRepository.GetAllBookingDetails();
-        var mapped = mapper.Map<IList<BookingDetailsDTO>>(list)
-            ?? throw new Exception($"Entity could not be mapped.");
-
-        return mapped;
+        var allBookings = await uow.BookingDetailsRepository.GetAllBookingDetails();
+        return allBookings.ToDtoList();
     }
 
     /// <summary>
@@ -34,13 +30,16 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// </summary>
     /// <param name="Id">The unique identifier of the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested booking details DTO.</returns>
-    public async Task<BookingDetailsDTO> ViewBookingDetails(Guid Id)
+    public async Task<BookingDetailsDTO?> ViewBookingDetails(Guid Id)
     {
-        var result = await uow.BookingDetailsRepository.GetBookingDetails(Id);
-        var mapped = mapper.Map<BookingDetailsDTO>(result)
-            ?? throw new Exception($"Entity could not be mapped.");
+        var booking = await uow.BookingDetailsRepository.GetBookingDetails(Id);
 
-        return mapped;
+        if (booking is not null)
+        {
+            return booking.ToDto();
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -50,25 +49,23 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// <returns>A task that represents the asynchronous operation, containing a string message indicating the result.</returns>
     public async Task<string> AddNewBooking(AddBookingDTO booking)
     {
-        var isFreeForBook = await FreeForBook(mapper.Map<CheckForFreeDTO>(booking));
+        var isFreeForBook = await FreeForBook(booking.ToFreeDto());
 
         if (isFreeForBook == false)
         {
             return "Camp is Not Free For Book";
         }
 
-        var mapped = mapper.Map<BookingDetails>(booking)
-            ?? throw new Exception($"Entity could not be mapped.");
+        var newBooking = booking.ToEntity();
 
-        mapped.Id = Guid.NewGuid();
-        mapped.ReferenceNumber = GetReferenceNumber.RandomNumber(
-            mapped.Id,
-            mapped.CellPhone,
-            mapped.ZipCode);
+        newBooking.ReferenceNumber = GetReferenceNumber.RandomNumber(
+            newBooking.Id,
+            newBooking.CellPhone,
+            newBooking.ZipCode);
 
         try
         {
-            string refNum = await uow.BookingDetailsRepository.AddBookingDetails(mapped);
+            string refNum = await uow.BookingDetailsRepository.AddBookingDetails(newBooking);
             bool res = await uow.SaveAsync();
 
             if (refNum != null && res)
@@ -107,15 +104,15 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// <param name="phone">The phone number associated with the booking.</param>
     /// <param name="zipCode">The zip code associated with the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found booking details DTO.</returns>
-    public async Task<BookingDetailsDTO> SearchBooking(string refNum, string phone, string zipCode)
+    public async Task<BookingDetailsDTO?> SearchBooking(string refNum, string phone, string zipCode)
     {
-        var results = await uow.BookingDetailsRepository.GetAllBookingDetails();
+        var allBookings = await uow.BookingDetailsRepository.GetAllBookingDetails();
 
-        foreach (var item in results)
+        foreach (var booking in allBookings)
         {
-            if (item.ReferenceNumber == refNum && item.CellPhone == phone && item.ZipCode == zipCode)
+            if (booking.ReferenceNumber == refNum && booking.CellPhone == phone && booking.ZipCode == zipCode)
             {
-                return mapper.Map<BookingDetailsDTO>(item);
+                return booking.ToDto();
             }
         }
 
@@ -177,13 +174,14 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// <returns>A task that represents the asynchronous operation, containing a list of camp details DTOs.</returns>
     public async Task<IList<CampDetailsDTO>> GetAllFreeCampsForBooking(SearchFreeCampsDTO data)
     {
-        var campList = await uow.CampRepository.GetCamps();
-        var result = new List<CampDetailsDTO>();
+        var campDetails = new List<CampDetailsDTO>();
 
-        foreach (var item in campList)
+        var campList = await uow.CampRepository.GetCamps();
+
+        foreach (var camp in campList)
         {
             var checkForFreeDto = new CheckForFreeDTO(
-                CampId: item.Id,
+                CampId: camp.Id,
                 CheckOut: data.CheckOut,
                 CheckIn: data.CheckIn);
 
@@ -191,12 +189,10 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
 
             if (res == true)
             {
-                var mapped = mapper.Map<CampDetailsDTO>(item)
-                    ?? throw new Exception($"Entity could not be mapped.");
-                result.Add(mapped);
+                campDetails.Add(camp.ToDetailsDTO());
             }
         }
 
-        return result;
+        return campDetails;
     }
 }

@@ -19,7 +19,7 @@ public interface IBookService
     /// </summary>
     /// <param name="Id">The unique identifier of the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested booking details DTO.</returns>
-    Task<BookingDetailsDTO> ViewBookingDetails(Guid Id);
+    Task<BookingDetailsDTO?> ViewBookingDetails(Guid Id);
 
     /// <summary>
     /// Adds a new booking.
@@ -42,7 +42,7 @@ public interface IBookService
     /// <param name="phone">The phone number associated with the booking.</param>
     /// <param name="zipCode">The zip code associated with the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found booking details DTO.</returns>
-    Task<BookingDetailsDTO> SearchBooking(string refNum, string phone, string zipCode);
+    Task<BookingDetailsDTO?> SearchBooking(string refNum, string phone, string zipCode);
 
     /// <summary>
     /// Checks if a camp is free for booking based on the provided data.

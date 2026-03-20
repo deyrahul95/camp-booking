@@ -18,7 +18,7 @@ public interface IBookingDetailsRepo
     /// </summary>
     /// <param name="Id">The unique identifier of the booking detail.</param>
     /// <returns>A task that resolves to the matching <c>BookingDetails</c> instance.</returns>
-    Task<BookingDetails> GetBookingDetails(Guid Id);
+    Task<BookingDetails?> GetBookingDetails(Guid Id);
 
     /// <summary>
     /// Adds a new booking detail to the data store.

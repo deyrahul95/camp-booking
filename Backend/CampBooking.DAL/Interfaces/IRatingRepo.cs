@@ -18,7 +18,7 @@ public interface IRatingRepo
     /// </summary>
     /// <param name="Id">The unique identifier of the rating.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested rating.</returns>
-    Task<Rating> GetRating(Guid Id);
+    Task<Rating?> GetRating(Guid Id);
 
     /// <summary>
     /// Adds a new rating to the repository.
@@ -33,5 +33,5 @@ public interface IRatingRepo
     /// <param name="Id">The unique identifier of the rating to be updated.</param>
     /// <param name="rating">The updated rating information.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated rating.</returns>
-    Task<Rating> UpdateRating(Guid Id, Rating rating);
+    Task<Rating?> UpdateRating(Guid Id, Rating rating);
 }

@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using CampBooking.DAL.Interfaces;
+﻿using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.Ratings.DTOs;
 using CampBooking.Domain.Ratings.Entity;
 using CampBooking.Service.Interfaces;
+using CampBooking.Shared.Mappers;
 
 namespace CampBooking.Service.Services;
 
@@ -11,8 +11,7 @@ namespace CampBooking.Service.Services;
 /// Implements the IRatingService interface.
 /// </summary>
 /// <param name="uow">The unit of work instance used for database operations.</param>
-/// <param name="mapper">The mapper instance used for mapping between entities and DTOs.</param>
-public class RatingService(IUnitOfWork uow, IMapper mapper) : IRatingService
+public class RatingService(IUnitOfWork uow) : IRatingService
 {
     /// <summary>
     /// Retrieves the rating for a specific camp by its unique identifier.
@@ -50,17 +49,17 @@ public class RatingService(IUnitOfWork uow, IMapper mapper) : IRatingService
     /// </summary>
     /// <param name="data">The search criteria for finding ratings.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found rating details DTO.</returns>
-    public async Task<RatingDTO> SearchRating(SearchRatingDTO data)
+    public async Task<RatingDTO?> SearchRating(SearchRatingDTO data)
     {
-        var list = await uow.RatingRepository.GetAllRatings();
+        var ratings = await uow.RatingRepository.GetAllRatings();
 
-        foreach (var item in list)
+        foreach (var rating in ratings)
         {
-            if (item.CampId == data.CampId
-                && item.CellPhone == data.CellPhone
-                && item.ReferenceNumber == data.ReferenceNumber)
+            if (rating.CampId == data.CampId
+                && rating.CellPhone == data.CellPhone
+                && rating.ReferenceNumber == data.ReferenceNumber)
             {
-                return mapper.Map<RatingDTO>(item);
+                return rating.ToDto();
             }
         }
 
@@ -72,15 +71,20 @@ public class RatingService(IUnitOfWork uow, IMapper mapper) : IRatingService
     /// </summary>
     /// <param name="rating">The rating information to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing the added rating details DTO.</returns>
-    public async Task<AddRatingDTO> AddNewRating(AddRatingDTO rating)
+    public async Task<AddRatingDTO?> AddNewRating(AddRatingDTO rating)
     {
-        var mapped = mapper.Map<Rating>(rating) ?? throw new Exception($"Entity could not be mapped.");
-        mapped.Id = Guid.NewGuid();
+        var newRating = rating.ToEntity();
 
         try
         {
-            Guid id = await uow.RatingRepository.AddRating(mapped);
+            Guid id = await uow.RatingRepository.AddRating(newRating);
             var camp = await uow.CampRepository.ViewDetails(rating.CampId);
+
+            if (camp is null)
+            {
+                return null;
+            }
+
             camp.Rating = await GetRating(camp.Id);
             bool res = await uow.SaveAsync();
 
@@ -103,20 +107,26 @@ public class RatingService(IUnitOfWork uow, IMapper mapper) : IRatingService
     /// <param name="id">The unique identifier of the rating to be updated.</param>
     /// <param name="rating">The updated rating information.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated rating details DTO.</returns>
-    public async Task<RatingDTO> UpdateRating(Guid id, RatingDTO rating)
+    public async Task<RatingDTO?> UpdateRating(Guid id, RatingDTO rating)
     {
-        var mapped = mapper.Map<Rating>(rating) ?? throw new Exception($"Entity could not be mapped.");
+        var mapped = rating.ToEntity();
 
         try
         {
             var existingRating = await uow.RatingRepository.UpdateRating(id, mapped);
             var camp = await uow.CampRepository.ViewDetails(rating.CampId);
+
+            if (camp is null)
+            {
+                return null;
+            }
+
             camp.Rating = await GetRating(camp.Id);
             bool res = await uow.SaveAsync();
 
             if (res && existingRating != null)
             {
-                return mapper.Map<RatingDTO>(existingRating);
+                return existingRating.ToDto();
             }
 
             return null;

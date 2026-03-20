@@ -3,17 +3,11 @@ using CampBooking.DAL.Interfaces;
 using CampBooking.DAL.Repository;
 using CampBooking.Service.Interfaces;
 using CampBooking.Service.Services;
-using CampBooking.Shared.Helper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-
-// Add Auto Mapper Profile
-builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICampService, CampService>();

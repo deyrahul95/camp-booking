@@ -26,7 +26,7 @@ public class RatingRepo(CampDBContext context) : IRatingRepo
     /// </summary>
     /// <param name="Id">The unique identifier of the rating.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested rating.</returns>
-    public async Task<Rating> GetRating(Guid Id)
+    public async Task<Rating?> GetRating(Guid Id)
     {
         return await context.Ratings.FindAsync(Id);
     }
@@ -58,7 +58,7 @@ public class RatingRepo(CampDBContext context) : IRatingRepo
     /// <param name="Id">The unique identifier of the rating to be updated.</param>
     /// <param name="rating">The updated rating information.</param>
     /// <returns>A task that represents the asynchronous operation, containing the updated rating.</returns>
-    public async Task<Rating> UpdateRating(Guid Id, Rating rating)
+    public async Task<Rating?> UpdateRating(Guid Id, Rating rating)
     {
         var existingRating = await GetRating(Id);
 

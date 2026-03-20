@@ -35,7 +35,7 @@ public class UserRepository(CampDBContext context) : IUserRepository
     /// </summary>
     /// <param name="email">The email address of the user to find.</param>
     /// <returns>The user associated with the specified email, or null if not found.</returns>
-    public User FindUserByEmail(string email)
+    public User? FindUserByEmail(string email)
     {
         var user = context.Users
             .Where(u => u.Email == email)
