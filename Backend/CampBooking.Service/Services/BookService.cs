@@ -20,10 +20,10 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// Retrieves all booking details.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation, containing a list of booking details DTOs.</returns>
-    public async Task<IList<BookDetailsDTO>> GetAllBookingDetails()
+    public async Task<IList<BookingDetailsDTO>> GetAllBookingDetails()
     {
         var list = await uow.BookingDetailsRepository.GetAllBookingDetails();
-        var mapped = mapper.Map<IList<BookDetailsDTO>>(list)
+        var mapped = mapper.Map<IList<BookingDetailsDTO>>(list)
             ?? throw new Exception($"Entity could not be mapped.");
 
         return mapped;
@@ -34,10 +34,10 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// </summary>
     /// <param name="Id">The unique identifier of the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested booking details DTO.</returns>
-    public async Task<BookDetailsDTO> ViewBookingDetails(Guid Id)
+    public async Task<BookingDetailsDTO> ViewBookingDetails(Guid Id)
     {
         var result = await uow.BookingDetailsRepository.GetBookingDetails(Id);
-        var mapped = mapper.Map<BookDetailsDTO>(result)
+        var mapped = mapper.Map<BookingDetailsDTO>(result)
             ?? throw new Exception($"Entity could not be mapped.");
 
         return mapped;
@@ -48,7 +48,7 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// </summary>
     /// <param name="booking">The booking information to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing a string message indicating the result.</returns>
-    public async Task<string> AddNewBooking(AddBookDTO booking)
+    public async Task<string> AddNewBooking(AddBookingDTO booking)
     {
         var isFreeForBook = await FreeForBook(mapper.Map<CheckForFreeDTO>(booking));
 
@@ -107,7 +107,7 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
     /// <param name="phone">The phone number associated with the booking.</param>
     /// <param name="zipCode">The zip code associated with the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found booking details DTO.</returns>
-    public async Task<BookDetailsDTO> SearchBooking(string refNum, string phone, string zipCode)
+    public async Task<BookingDetailsDTO> SearchBooking(string refNum, string phone, string zipCode)
     {
         var results = await uow.BookingDetailsRepository.GetAllBookingDetails();
 
@@ -115,7 +115,7 @@ public class BookService(IUnitOfWork uow, IMapper mapper) : IBookService
         {
             if (item.ReferenceNumber == refNum && item.CellPhone == phone && item.ZipCode == zipCode)
             {
-                return mapper.Map<BookDetailsDTO>(item);
+                return mapper.Map<BookingDetailsDTO>(item);
             }
         }
 

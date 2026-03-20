@@ -12,21 +12,21 @@ public interface IBookService
     /// Retrieves all booking details.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation, containing a list of booking details DTOs.</returns>
-    Task<IList<BookDetailsDTO>> GetAllBookingDetails();
+    Task<IList<BookingDetailsDTO>> GetAllBookingDetails();
 
     /// <summary>
     /// Retrieves specific booking details by its unique identifier.
     /// </summary>
     /// <param name="Id">The unique identifier of the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the requested booking details DTO.</returns>
-    Task<BookDetailsDTO> ViewBookingDetails(Guid Id);
+    Task<BookingDetailsDTO> ViewBookingDetails(Guid Id);
 
     /// <summary>
     /// Adds a new booking.
     /// </summary>
     /// <param name="booking">The booking information to be added.</param>
     /// <returns>A task that represents the asynchronous operation, containing a string message indicating the result.</returns>
-    Task<string> AddNewBooking(AddBookDTO booking);
+    Task<string> AddNewBooking(AddBookingDTO booking);
 
     /// <summary>
     /// Deletes a booking by its unique identifier.
@@ -42,7 +42,7 @@ public interface IBookService
     /// <param name="phone">The phone number associated with the booking.</param>
     /// <param name="zipCode">The zip code associated with the booking.</param>
     /// <returns>A task that represents the asynchronous operation, containing the found booking details DTO.</returns>
-    Task<BookDetailsDTO> SearchBooking(string refNum, string phone, string zipCode);
+    Task<BookingDetailsDTO> SearchBooking(string refNum, string phone, string zipCode);
 
     /// <summary>
     /// Checks if a camp is free for booking based on the provided data.

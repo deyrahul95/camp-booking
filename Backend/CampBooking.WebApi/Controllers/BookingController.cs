@@ -45,7 +45,7 @@ public class BookingController(IBookService service) : ControllerBase
     /// <param name="book">The data transfer object containing the details of the new booking.</param>
     /// <returns>An IActionResult indicating the result of the add operation.</returns>
     [HttpPost]
-    public async Task<IActionResult> AddNewBooking(AddBookDTO book)
+    public async Task<IActionResult> AddNewBooking(AddBookingDTO book)
     {
         var result = await service.AddNewBooking(book);
 

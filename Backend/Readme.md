@@ -3,7 +3,7 @@
 ## Prerequisite
 
 ```
-dotnet-9
+dotnet-10
 mysql-server
 dotnet ef tool [command line]
 ```

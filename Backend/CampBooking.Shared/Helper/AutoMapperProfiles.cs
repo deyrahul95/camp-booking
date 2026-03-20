@@ -20,9 +20,9 @@ public class AutoMapperProfiles : Profile
         CreateMap<User, UserDetails>().ReverseMap();
         CreateMap<User, LoginUser>().ReverseMap();
         CreateMap<User, LoginUserDetails>().ReverseMap();
-        CreateMap<BookingDetails, BookDetailsDTO>().ReverseMap();
-        CreateMap<BookingDetails, AddBookDTO>().ReverseMap();
-        CreateMap<AddBookDTO, CheckForFreeDTO>().ReverseMap();
+        CreateMap<BookingDetails, BookingDetailsDTO>().ReverseMap();
+        CreateMap<BookingDetails, AddBookingDTO>().ReverseMap();
+        CreateMap<AddBookingDTO, CheckForFreeDTO>().ReverseMap();
         CreateMap<Rating, RatingDTO>().ReverseMap();
         CreateMap<Rating, AddRatingDTO>().ReverseMap();
     }
