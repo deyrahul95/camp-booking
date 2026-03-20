@@ -1,4 +1,4 @@
-﻿namespace CampBooking.Domain.Entities;
+﻿namespace CampBooking.Domain.Ratings.Entity;
 
 public sealed class Rating
 {

@@ -1,4 +1,7 @@
-﻿using CampBooking.Domain.Entities;
+﻿using CampBooking.Domain.Bookings.Entity;
+using CampBooking.Domain.Camps.Entity;
+using CampBooking.Domain.Ratings.Entity;
+using CampBooking.Domain.Users.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CampBooking.DAL.DB;

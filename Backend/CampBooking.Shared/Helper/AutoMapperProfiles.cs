@@ -1,6 +1,13 @@
 ﻿using AutoMapper;
-using CampBooking.Domain.DTOs;
-using CampBooking.Domain.Entities;
+using CampBooking.Domain.Auth.DTOs;
+using CampBooking.Domain.Bookings.DTOs;
+using CampBooking.Domain.Bookings.Entity;
+using CampBooking.Domain.Camps.DTOs;
+using CampBooking.Domain.Camps.Entity;
+using CampBooking.Domain.Ratings.DTOs;
+using CampBooking.Domain.Ratings.Entity;
+using CampBooking.Domain.Users.DTOs;
+using CampBooking.Domain.Users.Entity;
 
 namespace CampBooking.Shared.Helper;
 

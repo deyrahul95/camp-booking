@@ -1,4 +1,4 @@
-﻿namespace CampBooking.Domain.Entities;
+﻿namespace CampBooking.Domain.Camps.Entity;
 
 public sealed class Camp
 {

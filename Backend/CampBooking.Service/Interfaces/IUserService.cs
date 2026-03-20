@@ -1,4 +1,4 @@
-﻿using CampBooking.Domain.DTOs;
+﻿using CampBooking.Domain.Auth.DTOs;
 
 namespace CampBooking.Service.Interfaces;
 

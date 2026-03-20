@@ -1,4 +1,4 @@
-﻿using CampBooking.Domain.DTOs;
+﻿using CampBooking.Domain.Auth.DTOs;
 using CampBooking.Service.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

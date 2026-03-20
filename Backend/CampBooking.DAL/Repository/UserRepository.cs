@@ -1,6 +1,6 @@
 ﻿using CampBooking.DAL.DB;
 using CampBooking.DAL.Interfaces;
-using CampBooking.Domain.Entities;
+using CampBooking.Domain.Users.Entity;
 
 namespace CampBooking.DAL.Repository;
 

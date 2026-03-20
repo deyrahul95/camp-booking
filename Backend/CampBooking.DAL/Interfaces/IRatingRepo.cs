@@ -1,4 +1,4 @@
-﻿using CampBooking.Domain.Entities;
+﻿using CampBooking.Domain.Ratings.Entity;
 
 namespace CampBooking.DAL.Interfaces;
 
