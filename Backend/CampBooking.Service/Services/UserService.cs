@@ -4,35 +4,43 @@ using CampBooking.Domain.DTOs;
 using CampBooking.Domain.Entities;
 using CampBooking.Service.Interfaces;
 
-namespace CampBooking.Service.Services
+namespace CampBooking.Service.Services;
+
+/// <summary>
+/// Service class for managing user operations.
+/// Implements the IUserService interface.
+/// </summary>
+/// <param name="uow">The unit of work instance used for database operations.</param>
+/// <param name="mapper">The mapper instance used for mapping between entities and DTOs.</param>
+public class UserService(IUnitOfWork uow, IMapper mapper) : IUserService
 {
-    public class UserService : IUserService
+    /// <summary>
+    /// Authenticates a user using their email and password.
+    /// </summary>
+    /// <param name="user">The user information for login.</param>
+    /// <returns>True if the login is successful; otherwise, false.</returns>
+    public bool LoginUsingEmailAndPassword(LoginUser user)
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        var mapped = mapper.Map<User>(user);
+        var result = uow.UserRepository.UserLogin(mapped);
+        return result;
+    }
 
-        public UserService(IUnitOfWork uow, IMapper mapper)
+    /// <summary>
+    /// Retrieves the details of a user by their email address.
+    /// </summary>
+    /// <param name="email">The email address of the user.</param>
+    /// <returns>The details of the user associated with the specified email.</returns>
+    public LoginUserDetails GetUserDetails(string email)
+    {
+        var result = uow.UserRepository.FindUserByEmail(email);
+
+        if (result == null)
         {
-            _uow = uow ?? throw new ArgumentNullException(nameof(uow));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            return null;
         }
 
-        public bool LoginUsingEmailAndPassword(LoginUser _user)
-        {
-            var mapped = _mapper.Map<User>(_user);
-            var result = _uow.UserRepository.UserLogin(mapped);
-            return result;
-        }
-
-        public LoginUserDetails GetUserDetails(string _email)
-        {
-            var result = _uow.UserRepository.FindUserByEmail(_email);
-            if(result == null)
-            {
-                return null;
-            }
-            var mapped = _mapper.Map<LoginUserDetails>(result);
-            return mapped;
-        }
+        var mapped = mapper.Map<LoginUserDetails>(result);
+        return mapped;
     }
 }

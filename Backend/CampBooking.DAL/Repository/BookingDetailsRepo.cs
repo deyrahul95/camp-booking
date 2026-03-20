@@ -2,63 +2,79 @@
 using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
 
-namespace CampBooking.DAL.Repository
+namespace CampBooking.DAL.Repository;
+
+/// <summary>
+/// Repository class for managing booking details in the CampDB context.
+/// Implements the IBookingDetailsRepo interface.
+/// </summary>
+/// <param name="context">The CampDBContext instance used for database operations.</param>
+public class BookingDetailsRepo(CampDBContext context) : IBookingDetailsRepo
 {
-    public class BookingDetailsRepo : IBookingDetailsRepo
+    /// <summary>
+    /// Retrieves all booking details.
+    /// </summary>
+    /// <returns>A task that resolves to a list of all <c>BookingDetails</c> records.</returns>
+    public async Task<IList<BookingDetails>> GetAllBookingDetails()
     {
-        private readonly CampDBContext _context;
+        return await context.BookingDetails.ToListAsync();
+    }
 
-        public BookingDetailsRepo(CampDBContext context)
+    /// <summary>
+    /// Retrieves a single booking detail by its identifier.
+    /// </summary>
+    /// <param name="Id">The unique identifier of the booking detail.</param>
+    /// <returns>A task that resolves to the matching <c>BookingDetails</c> instance.</returns>
+    public async Task<BookingDetails> GetBookingDetails(Guid Id)
+    {
+        return await context.BookingDetails.FindAsync(Id);
+    }
+
+    /// <summary>
+    /// Adds a new booking detail to the data store.
+    /// </summary>
+    /// <param name="_book">The booking detail entity to add.</param>
+    /// <returns>A task that resolves to a string, typically the identifier of the newly created record.</returns>
+    public async Task<string> AddBookingDetails(BookingDetails _book)
+    {
+        var newBooking = new BookingDetails()
         {
-            _context = context;
+            Id = _book.Id,
+            CampId = _book.CampId,
+            ReferenceNumber = _book.ReferenceNumber,
+            Price = _book.Price,
+            Persons = _book.Persons,
+            Nights = _book.Nights,
+            CheckIn = _book.CheckIn,
+            CheckOut = _book.CheckOut,
+            Address = _book.Address,
+            State = _book.State,
+            Country = _book.Country,
+            ZipCode = _book.ZipCode,
+            CellPhone = _book.CellPhone
+        };
+
+        await context.BookingDetails.AddAsync(newBooking);
+        return newBooking.ReferenceNumber;
+    }
+
+    /// <summary>
+    /// Deletes an existing booking detail.
+    /// </summary>
+    /// <param name="Id">The unique identifier of the booking detail to delete.</param>
+    /// <returns>A task that resolves to <c>true</c> if the deletion succeeded; otherwise <c>false</c>.</returns>
+    public async Task<bool> DeleteBookingDetails(Guid Id)
+    {
+        try
+        {
+            var book = await context.BookingDetails.FindAsync(Id);
+            context.BookingDetails.Remove(book);
+            return true;
         }
-
-        public async Task<IList<BookingDetails>> GetAllBookingDetails()
+        catch (Exception e)
         {
-            return await _context.BookingDetails.ToListAsync();
-        }
-
-        public async Task<BookingDetails> GetBookingDetails(Guid Id)
-        {
-            return await _context.BookingDetails.FindAsync(Id);
-        }
-
-        public async Task<string> AddBookingDetails(BookingDetails _book)
-        {
-            var newBooking = new BookingDetails()
-            {
-                Id = _book.Id,
-                CampId = _book.CampId,
-                ReferenceNumber = _book.ReferenceNumber,
-                Price = _book.Price,
-                Persons = _book.Persons,
-                Nights = _book.Nights,
-                CheckIn = _book.CheckIn,
-                CheckOut = _book.CheckOut,
-                Address = _book.Address,
-                State = _book.State,
-                Country = _book.Country,
-                ZipCode = _book.ZipCode,
-                CellPhone = _book.CellPhone
-            };
-            await _context.BookingDetails.AddAsync(newBooking);
-            return newBooking.ReferenceNumber;
-        }
-
-        public async Task<bool> DeleteBookingDetails(Guid Id)
-        {
-            try
-            {
-                var book = await _context.BookingDetails.FindAsync(Id);
-                 _context.BookingDetails.Remove(book);
-                return true;
-            }
-            catch(Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            throw new Exception(e.Message);
         }
     }
 }

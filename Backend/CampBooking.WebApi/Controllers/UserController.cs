@@ -8,25 +8,15 @@ namespace CampBooking.WebApi.Controllers;
 /// <summary>
 /// Represents user controller for managing user details.
 /// </summary>
+/// <param name="service">The user service interface.</param>
+/// <remarks>
+/// Create an instance of UserController class.
+/// </remarks>
 [ApiController]
 [Route("api/User")]
 [Produces("application/json")]
-public class UserController : Controller
+public class UserController(IUserService service) : Controller
 {
-    /// <summary>
-    /// Represents user service interface.
-    /// </summary>
-    private readonly IUserService _service;
-
-    /// <summary>
-    /// Create an instance of UserController class.
-    /// </summary>
-    /// <param name="service">The user service interface.</param>
-    public UserController(IUserService service)
-    {
-        _service = service;
-    }
-
     /// <summary>
     /// Login to camp booking.
     /// </summary>
@@ -39,7 +29,7 @@ public class UserController : Controller
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequest))]
     public IActionResult Login(LoginUser user)
     {
-        var result = _service.LoginUsingEmailAndPassword(user);
+        var result = service.LoginUsingEmailAndPassword(user);
 
         if (result == false)
         {
@@ -62,7 +52,7 @@ public class UserController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFound))]
     public IActionResult UserDetailsByEmail([FromRoute] string email)
     {
-        var result = _service.GetUserDetails(email);
+        var result = service.GetUserDetails(email);
 
         if (result == null)
         {

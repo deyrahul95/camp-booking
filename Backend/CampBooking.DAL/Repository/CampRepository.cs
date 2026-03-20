@@ -3,57 +3,94 @@ using CampBooking.DAL.Interfaces;
 using CampBooking.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CampBooking.DAL.Repository
+namespace CampBooking.DAL.Repository;
+
+/// <summary>
+/// Repository class for managing camp-related operations in the CampDB context.
+/// Implements the ICampRepository interface.
+/// </summary>
+/// <param name="context">The CampDBContext instance used for database operations.</param>
+public class CampRepository(CampDBContext context) : ICampRepository
 {
-    public class CampRepository : ICampRepository
+    /// <summary>
+    /// Retrieves all camps.
+    /// </summary>
+    /// <returns>A task that resolves to a list of <c>Camp</c> records.</returns>
+    public async Task<IList<Camp>> GetCamps()
     {
-        private readonly CampDBContext _context;
+        return await context.Camps.ToListAsync();
+    }
 
-        public CampRepository(CampDBContext context)
+    /// <summary>
+    /// Retrieves detailed information for a specific camp.
+    /// </summary>
+    /// <param name="Id">The unique identifier of the camp.</param>
+    /// <returns>A task that resolves to the matching <c>Camp</c> instance.</returns>
+    public async Task<Camp> ViewDetails(Guid Id)
+    {
+        return await context.Camps.FindAsync(Id);
+    }
+
+    /// <summary>
+    /// Adds a new camp to the data store.
+    /// </summary>
+    /// <param name="camp">The camp entity to add.</param>
+    /// <returns>A task that resolves to the <c>Guid</c> of the newly created camp.</returns>
+    public async Task<Guid> AddCamp(Camp camp)
+    {
+        var newCamp = new Camp()
         {
-            _context = context;
-        }
-        public async Task<IList<Camp>> GetCamps()
+            Id = camp.Id,
+            Name = camp.Name,
+            Price = camp.Price,
+            Capacity = camp.Capacity,
+            Description = camp.Description,
+            ImageUrl = camp.ImageUrl,
+        };
+
+        await context.Camps.AddAsync(newCamp);
+        return newCamp.Id;
+    }
+
+    /// <summary>
+    /// Updates an existing camp.
+    /// </summary>
+    /// <param name="Id">The identifier of the camp to edit.</param>
+    /// <param name="camp">The updated camp data.</param>
+    /// <returns>A task that resolves to the updated <c>Camp</c> instance.</returns>
+    public async Task<Camp> EditCamp(Guid Id, Camp camp)
+    {
+        var existingCamp = await ViewDetails(Id);
+
+        if (existingCamp == null)
         {
-            return await _context.Camps.ToListAsync();
-        }
-        public async Task<Camp> ViewDetails(Guid Id)
-        {
-            return await _context.Camps.FindAsync(Id);
-        }
-        public async Task<Guid> AddCamp(Camp _camp)
-        {
-            var newCamp = new Camp()
-            {
-                Id = _camp.Id,
-                Name = _camp.Name,
-                Price = _camp.Price,
-                Capacity = _camp.Capacity,
-                Description = _camp.Description,
-                ImageUrl = _camp.ImageUrl,
-            };
-            await _context.Camps.AddAsync(newCamp);
-            return newCamp.Id;
+            return null;
         }
 
-        public async Task<Camp> EditCamp(Guid Id, Camp _camp)
+        existingCamp.Name = camp.Name;
+        existingCamp.Price = camp.Price;
+        existingCamp.Capacity = camp.Capacity;
+        existingCamp.Description = camp.Description;
+        existingCamp.ImageUrl = camp.ImageUrl;
+
+        return existingCamp;
+    }
+
+    /// <summary>
+    /// Deletes a camp.
+    /// </summary>
+    /// <param name="Id">The identifier of the camp to delete.</param>
+    /// <returns>A task that resolves to <c>true</c> if deletion succeeded; otherwise <c>false</c>.</returns>
+    public async Task<bool> DeleteCamp(Guid Id)
+    {
+        var camp = await ViewDetails(Id);
+
+        if (camp == null)
         {
-            var camp = await ViewDetails(Id);
-            if (camp == null) return null;
-            camp.Name = _camp.Name;
-            camp.Price = _camp.Price;
-            camp.Capacity = _camp.Capacity;
-            camp.Description = _camp.Description;
-            camp.ImageUrl = _camp.ImageUrl;
-            return camp;
+            return false;
         }
 
-        public async Task<bool> DeleteCamp(Guid Id)
-        {
-            var camp = await ViewDetails(Id);
-            if (camp == null) return false;
-            _context.Camps.Remove(camp);
-            return true;
-        }
+        context.Camps.Remove(camp);
+        return true;
     }
 }
